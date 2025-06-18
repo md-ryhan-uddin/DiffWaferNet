@@ -112,7 +112,6 @@ Open and run the notebook `code/diffwafernet.ipynb`
 ### Evaluation:
 - **Accuracy**: Overall classification success
 - **Confusion Matrix**: Class-specific insight
-- **ROC**: Not used (multi-class setting)
 - **Precision/Recall/F1**: Key for class imbalance
 
 ## Example Code
