@@ -120,12 +120,12 @@ Open and run the notebook `code/diffwafernet.ipynb`
 import numpy as np
 from tensorflow.keras.models import load_model
 
-# Load preprocessed wafer data
-with open("data.pkl", "rb") as f:
+# Load wafer data
+with open("LSWMD.pkl", "rb") as f:
     data = pickle.load(f)
 
 # Example inference
-model = load_model("DiffWaferNet_model.keras")
+model = load_model("diffwafernet.keras")
 preds = model.predict(data["X_test"])
 print("Predicted Class:", np.argmax(preds, axis=1))
 ```
