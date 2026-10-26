@@ -1,4 +1,3 @@
-
 # DiffWaferNet: A Lightweight Differential Attention Network for Wafermap Defect Classification
 
 ## Description
