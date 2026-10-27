@@ -1,107 +1,44 @@
-# DiffWaferNet: A Lightweight Differential Attention-Based Network for Wafermap Defect Classification
+# DiffWaferNet
 
+DiffWaferNet is a lightweight deep learning framework for wafer map defect classification. It combines a CNN backbone, a differential attention module, and a class-conditional augmentation strategy to improve performance on imbalanced wafer defect patterns while keeping the model efficient.
 
-## Description
+<p align="center">
+  <img src="figures/model.png" alt="DiffWaferNet model architecture" width="1200" />
+</p>
 
-DiffWaferNet is a lightweight deep learning framework for wafermap defect classification in semiconductor manufacturing. It combines a convolutional neural network (CNN), a differential attention mechanism, and a Conditional Variational Autoencoder (CVAE) to address classification challenges caused by severe class imbalance.
+## Paper
 
-The framework aims to improve recognition of common and underrepresented wafer defect patterns while maintaining computational efficiency for potential industrial applications.
+Read the full paper on ResearchGate [https://www.researchgate.net/publication/416922739].
 
-## Dataset Information
+## Highlights
 
-### Dataset Source
+- Lightweight CNN + differential attention architecture
+- Synthetic minority-sample generation for class imbalance
+- 8 wafer defect classes plus normal wafers
+- Evaluation with confusion matrix and macro metrics
+- Suitable for research and practical defect inspection workflows
 
-- **Dataset:** WM-811K Wafer Map Dataset
-- **Source:** [WM-811K on Kaggle](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map)
+## Dataset
 
-### Dataset Citation
+This project uses the WM-811K wafer map dataset.
 
-Wu, M.-J., Jang, J.-S. R., & Chen, J.-L. (2015). Wafer map failure pattern recognition and similarity ranking for large-scale data sets. *IEEE Transactions on Semiconductor Manufacturing, 28*(1), 1–12. https://doi.org/10.1109/TSM.2014.2364237
+- Dataset: WM-811K
+- Source: [Kaggle](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map)
+- Classes: Center, Donut, Edge-Loc, Edge-Ring, Loc, Random, Scratch, Near-Full
 
-### Defect Classes
+For a full dataset description and usage notes, see [data/DATASET.md](data/DATASET.md).
 
-The eight defect classes considered in the classification framework are:
+> Dataset files are not included in this repository because of size limits. Download the dataset from Kaggle and place it in the project data directory before running experiments.
 
-1. Center
-2. Edge-Loc
-3. Edge-Ring
-4. Donut
-5. Loc
-6. Random
-7. Scratch
-8. Near-Full
+## Project Structure
 
-### Preprocessing
+- `code/` — training and analysis notebooks
+- `data/` — dataset files and dataset notes
+- `outputs/` — trained model and evaluation artifacts
+- `figures/` — model and visualization assets
+- `requirements.txt` — Python dependencies
 
-- Resize wafer maps to `32 × 32 × 3`.
-- Encode wafer maps using three-channel representations.
-- Remove unlabeled and irrelevant samples.
-- Use the predefined train/test split where applicable.
-- Apply normalization and data augmentation as configured in the experiments.
-
-## Code Information
-
-The implementation covers the following stages:
-
-1. **Data Loading:** Load the wafermap dataset from a serialized `.pkl` file.
-2. **Preprocessing:** Resize, encode, and transform wafer maps.
-3. **Synthetic Data Generation:** Use a CVAE to generate class-conditioned samples for minority classes.
-4. **Dataset Integration:** Combine synthetic samples with real training data.
-5. **Model Architecture:**
-   - CNN backbone
-   - Differential attention layer
-   - Fully connected classification layers
-   - Dropout and softmax output
-6. **Model Training:**
-   - Optimizer: Adam
-   - Loss: Categorical cross-entropy
-   - Early stopping and learning-rate scheduling
-7. **Model Evaluation:**
-   - Confusion matrix
-   - Accuracy, precision, recall, and F1-score
-8. **Ablation Study:** Compare CNN-only, CNN with standard attention, and DiffWaferNet configurations.
-
-## Methodology
-
-### 1. Data Processing
-
-Exploratory data analysis is used to inspect class distributions and wafer defect patterns. The preprocessing pipeline includes selecting labeled classes, converting wafer maps into three-channel representations, resizing maps to a consistent input shape, and preparing training, validation, and test sets.
-
-### 2. Synthetic Data Generation with CVAE
-
-A Conditional Variational Autoencoder generates synthetic wafer maps conditioned on defect classes. Class labels guide the generation of class-consistent samples, helping mitigate severe class imbalance. Synthetic samples are integrated into the training data to improve the representation of underrepresented classes.
-
-### 3. DiffWaferNet Architecture
-
-**CNN Backbone**
-- Three convolutional layers with 32, 64, and 128 filters.
-- Spatial feature extraction from wafermap representations.
-
-**Differential Attention**
-- Computes two attention distributions.
-- Combines them using a learnable differential weighting mechanism.
-- Emphasizes informative features for defect classification.
-
-**Classification Head**
-- Global Average Pooling (GAP)
-- Dense layer with 32 units
-- Dropout
-- Eight-class softmax output
-
-## Evaluation Metrics
-
-- **Accuracy:** Overall classification performance.
-- **Macro Precision:** Average precision across defect classes.
-- **Macro Recall:** Average recall across defect classes.
-- **Macro F1-score:** Balanced assessment of precision and recall across classes.
-- **Confusion Matrix:** Class-specific classification performance.
-- **Saliency Maps:** Visual interpretation of regions relevant to model predictions.
-
-Macro-averaged metrics are particularly useful when defect classes have substantially different sample counts.
-
-## Usage Instructions
-
-### Google Colab Setup
+## Quick Start
 
 #### 1. Upload the Required Files
 
@@ -113,9 +50,7 @@ from google.colab import files
 uploaded = files.upload()
 ```
 
-#### 2. Install Dependencies
-
-If a `requirements.txt` file is available, install dependencies:
+#### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -153,87 +88,17 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
-# Load the dataset
-with open("LSWMD.pkl", "rb") as f:
-    data = pickle.load(f)
-
-# Load the trained model
-model = tf.keras.models.load_model(
-    "diffwafernet.keras",
-    compile=False
-)
-
-# Predict wafer defect classes
-predictions = model.predict(data["X_test"])
-
-# Obtain the predicted class index
-predicted_classes = np.argmax(predictions, axis=1)
-
-print("Predicted classes:", predicted_classes)
+model = tf.keras.models.load_model("outputs/diffwafernet.keras", compile=False)
 ```
 
-**Note:** This example assumes that the serialized dataset contains an `X_test` entry and that the saved model accepts the supplied input shape. Apply the same preprocessing used during training before inference.
-
-## Materials and Methods
-
-### Software and Libraries
-
-- Python
-- TensorFlow / Keras
-- NumPy
-- Pandas
-- Matplotlib
-- Scikit-learn
-- Jupyter Notebook
-
-### Computing Environment
-
-The original project documentation identifies the following environments:
-
-- **Operating systems:** Windows 11 and Linux-based notebook environments.
-- **Notebook environment:** Kaggle Notebook.
-- **Reported GPU configuration:** Dual NVIDIA Tesla T4 GPUs.
-- **Local hardware:** Intel Core i7-1165G7 CPU with 16 GB RAM.
-
-Actual training requirements depend on dataset size, batch size, model configuration, and synthetic data generation settings.
-
-## Reproducibility
-
-For reproducible experiments:
-
-1. Use the same dataset version and preprocessing configuration.
-2. Maintain consistent training, validation, and test partitions.
-3. Record random seeds and model hyperparameters.
-4. Document the CVAE configuration and synthetic sample-generation procedure.
-5. Evaluate all model variants using the same test set.
-6. Report class-wise metrics alongside overall accuracy.
-
-## License and Attribution
-
-Check the repository's license and the published article's license before redistributing the implementation or associated materials. Publication of a paper does not automatically establish an open-source license for its code.
-
-When using this method or discussing its findings in academic work, cite the published article:
-
-Uddin et al. (2026), *PeerJ Computer Science, 12*, e3947. https://doi.org/10.7717/peerj-cs.3947
-
-
-## Cite This Work
-
-**APA-style citation**
+## Citation
 
 Uddin, M. R., Islam, M. S., Farid, F. A., Uddin, J., & Mansor, S. B. (2026). DiffWaferNet: A lightweight differential attention-based network for wafermap defect classification. *PeerJ Computer Science, 12*, e3947. https://doi.org/10.7717/peerj-cs.3947
 
-**BibTeX**
-
 ```bibtex
 @article{uddin2026diffwafernet,
-  author  = {Uddin, Md Ryhan and
-             Islam, Md Saiful and
-             Farid, Fahmid Al and
-             Uddin, Jia and
-             Mansor, Sarina Binti},
-  title   = {DiffWaferNet: A lightweight differential attention-based
-             network for wafermap defect classification},
+  author  = {Uddin, Md Ryhan and Islam, Md Saiful and Farid, Fahmid Al and Uddin, Jia and Mansor, Sarina Binti},
+  title   = {DiffWaferNet: A lightweight differential attention-based network for wafermap defect classification},
   journal = {PeerJ Computer Science},
   volume  = {12},
   pages   = {e3947},
